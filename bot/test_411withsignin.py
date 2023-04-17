@@ -12,7 +12,9 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
 from selenium.webdriver.firefox.service import Service as FirefoxService
-from webdriver_manager.firefox import GeckoDriverManager
+
+
+# from webdriver_manager.firefox import GeckoDriverManager
 
 
 class Test411withsignin():
@@ -25,8 +27,8 @@ class Test411withsignin():
         # keep the window open after test is done for debugging.
         options = Options()
         options.add_experimental_option("detach", True)
-        #self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-        self.driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+        # self.driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
 
         self.vars = {}
 
@@ -36,7 +38,7 @@ class Test411withsignin():
         pass
 
     def test_411withsignin(self):
-        wait = WebDriverWait(self.driver, 30) # lmfao 30 seconds timeout GOD DAMN student link is slow
+        wait = WebDriverWait(self.driver, 30)  # lmfao 30 seconds timeout GOD DAMN student link is slow
 
         # initial exported code:
         # Test name: 411-with-signin
@@ -46,61 +48,40 @@ class Test411withsignin():
         # 2 | setWindowSize | 1440x819 |
         self.driver.set_window_size(1440, 819)
 
-        # step 3 kinda useless lol
-        # 3 | click | css=.comm-tile-menu__item-title-underline
         # self.driver.find_element(By.CSS_SELECTOR, ".comm-tile-menu__item-title-underline").click()
         wait.until(expected_conditions.presence_of_element_located((By.ID, "j_username")))
-        # 4 | type | id=j_username | username
+        # 3 | type | id=j_username | username
         self.driver.find_element(By.ID, "j_username").send_keys(self.username)
-        # 5 | type | id=j_password | password
+        # 4 | type | id=j_password | password
         self.driver.find_element(By.ID, "j_password").send_keys(self.password)
-        # 6 | click | name=_eventId_proceed |
+        # 5 | click | name=_eventId_proceed |
         self.driver.find_element(By.NAME, "_eventId_proceed").click()
 
         # after we've signed in, we need to wait for 2fa to go through. wait until redirect
         # FIXME: we don't set "remember me" here so we have to wait for 2fa every time
-
         wait.until(expected_conditions.url_changes("https://student.bu.edu/MyBU/s/"))
-        # 7 | click | css=tr:nth-child(18) a:nth-child(2) |
-        # self.driver.find_element(By.CSS_SELECTOR, "tr:nth-child(18) a:nth-child(2)").click()
 
-        # realized the initial code was redirected to a different page, other generated code:
-        element = wait.until(expected_conditions.element_to_be_clickable((By.CLASS_NAME, "community_navigation-tileMenuItemBanner_tileMenuItemBanner")))
+        # student link slow, wait until loaded
+        element = wait.until(expected_conditions.element_to_be_clickable(
+            (By.CLASS_NAME, "community_navigation-tileMenuItemBanner_tileMenuItemBanner")))
         element.click()
 
-        # see issue https://github.com/s-alad/busniper/issues/1
-        # 3 | click | css=.comm-tile-menu__item-title-underline |
-        self.driver.find_element(By.CSS_SELECTOR, ".comm-tile-menu__item-title-underline").click()
-        # 4 | click | css=tr:nth-child(18) a:nth-child(2) |
+        # 6 | click | css=tr:nth-child(18) a:nth-child(2) |
         self.driver.find_element(By.CSS_SELECTOR, "tr:nth-child(18) a:nth-child(2)").click()
-        # 5 | click | linkText=Register for Class |
+        # 7 | click | linkText=Register for Class |
         self.driver.find_element(By.LINK_TEXT, "Register for Class").click()
-        # 6 | click | name=College |
+        # 8 | click | name=College |
         self.driver.find_element(By.NAME, "College").click()
-        # 7 | select | name=College | label=CAS
+        # 9 | select | name=College | label=CAS
         dropdown = self.driver.find_element(By.NAME, "College")
         dropdown.find_element(By.XPATH, "//option[. = 'CAS']").click()
-        # 8 | type | name=Dept | cs
+        # 10 | type | name=Dept | cs
         self.driver.find_element(By.NAME, "Dept").send_keys("cs")
-        # 9 | type | name=Course | 411
+        # 11 | type | name=Course | 411
         self.driver.find_element(By.NAME, "Course").send_keys("411")
-        # 10 | click | css=td:nth-child(6) > input |
+        # 12 | click | css=td:nth-child(6) > input |
         self.driver.find_element(By.CSS_SELECTOR, "td:nth-child(6) > input").click()
 
-        # again back to initially generated code:
-        # 8 | click | linkText=Register for Class |
-        # self.driver.find_element(By.LINK_TEXT, "Register for Class").click()
-        # # 9 | click | name=College |
-        # self.driver.find_element(By.NAME, "College").click()
-        # # 10 | select | name=College | label=CAS
-        # dropdown = self.driver.find_element(By.NAME, "College")
-        # dropdown.find_element(By.XPATH, "//option[. = 'CAS']").click()
-        # # 11 | type | name=Dept | cs
-        # self.driver.find_element(By.NAME, "Dept").send_keys("cs")
-        # # 12 | type | name=Course | 411
-        # self.driver.find_element(By.NAME, "Course").send_keys("411")
-        # # 13 | click | css=td:nth-child(6) > input |
-        # self.driver.find_element(By.CSS_SELECTOR, "td:nth-child(6) > input").click()
 
 if __name__ == "__main__":
     test = Test411withsignin()
