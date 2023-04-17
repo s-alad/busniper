@@ -60,27 +60,25 @@ class Test411withsignin():
         # FIXME: we don't set "remember me" here so we have to wait for 2fa every time
         wait.until(expected_conditions.url_changes("https://student.bu.edu/MyBU/s/"))
 
-        # student link slow, wait until loaded
-        class_registration = wait.until(expected_conditions.element_to_be_clickable(
-            (By.CLASS_NAME, "community_navigation-tileMenuItemBanner_tileMenuItemBanner")))
-        class_registration.click()
+        # after redirect, we don't need to interact with the ui.
+        # just navigate to the registration page immediately
+        self.driver.get(
+            "https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1681765714?ModuleName=reg/option/_start.pl&ViewSem=Fall%202023&KeySem=20243")
 
-        # 6 | click | css=tr:nth-child(18) a:nth-child(2) |
-        fall_2023_registration = wait.until(
-            expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "tr:nth-child(18) a:nth-child(2)")))
-        fall_2023_registration.click()
-        # 7 | click | linkText=Register for Class |
-        self.driver.find_element(By.LINK_TEXT, "Register for Class").click()
-        # 8 | click | name=College |
+        # 6 | click | linkText=Register for Class |
+        register_for_class = wait.until(
+            expected_conditions.element_to_be_clickable((By.LINK_TEXT, "Register for Class")))
+        register_for_class.click()
+        # 7 | click | name=College |
         self.driver.find_element(By.NAME, "College").click()
-        # 9 | select | name=College | label=CAS
+        # 8 | select | name=College | label=CAS
         dropdown = self.driver.find_element(By.NAME, "College")
         dropdown.find_element(By.XPATH, "//option[. = 'CAS']").click()
-        # 10 | type | name=Dept | cs
+        # 9 | type | name=Dept | cs
         self.driver.find_element(By.NAME, "Dept").send_keys("cs")
-        # 11 | type | name=Course | 411
+        # 10 | type | name=Course | 411
         self.driver.find_element(By.NAME, "Course").send_keys("411")
-        # 12 | click | css=td:nth-child(6) > input |
+        # 11 | click | css=td:nth-child(6) > input |
         self.driver.find_element(By.CSS_SELECTOR, "td:nth-child(6) > input").click()
 
 
