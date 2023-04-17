@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as expected_conditions
+
 
 class Test411withsignin():
     load_dotenv()
@@ -24,6 +27,9 @@ class Test411withsignin():
         pass
 
     def test_411withsignin(self):
+        wait = WebDriverWait(self.driver, 30) # lmfao 30 seconds timeout GOD DAMN student link is slow
+
+        # initial exported code:
         # Test name: 411-with-signin
         # Step # | name | target | value
         # 1 | open | https://student.bu.edu/MyBU/s/ |
@@ -34,24 +40,55 @@ class Test411withsignin():
         # step 3 kinda useless lol
         # 3 | click | css=.comm-tile-menu__item-title-underline
         # self.driver.find_element(By.CSS_SELECTOR, ".comm-tile-menu__item-title-underline").click()
+        wait.until(expected_conditions.presence_of_element_located((By.ID, "j_username")))
         # 4 | type | id=j_username | username
         self.driver.find_element(By.ID, "j_username").send_keys(self.username)
         # 5 | type | id=j_password | password
         self.driver.find_element(By.ID, "j_password").send_keys(self.password)
         # 6 | click | name=_eventId_proceed |
         self.driver.find_element(By.NAME, "_eventId_proceed").click()
+
+        # after we've signed in, we need to wait for 2fa to go through. wait until redirect
+        # FIXME: we don't set "remember me" here so we have to wait for 2fa every time
+
+        wait.until(expected_conditions.url_changes("https://student.bu.edu/MyBU/s/"))
         # 7 | click | css=tr:nth-child(18) a:nth-child(2) |
+        # self.driver.find_element(By.CSS_SELECTOR, "tr:nth-child(18) a:nth-child(2)").click()
+
+        # realized the initial code was redirected to a different page, other generated code:
+        element = wait.until(expected_conditions.element_to_be_clickable((By.CLASS_NAME, "community_navigation-tileMenuItemBanner_tileMenuItemBanner")))
+        element.click()
+
+        # see issue https://github.com/s-alad/busniper/issues/1
+        # 3 | click | css=.comm-tile-menu__item-title-underline |
+        self.driver.find_element(By.CSS_SELECTOR, ".comm-tile-menu__item-title-underline").click()
+        # 4 | click | css=tr:nth-child(18) a:nth-child(2) |
         self.driver.find_element(By.CSS_SELECTOR, "tr:nth-child(18) a:nth-child(2)").click()
-        # 8 | click | linkText=Register for Class |
+        # 5 | click | linkText=Register for Class |
         self.driver.find_element(By.LINK_TEXT, "Register for Class").click()
-        # 9 | click | name=College |
+        # 6 | click | name=College |
         self.driver.find_element(By.NAME, "College").click()
-        # 10 | select | name=College | label=CAS
+        # 7 | select | name=College | label=CAS
         dropdown = self.driver.find_element(By.NAME, "College")
         dropdown.find_element(By.XPATH, "//option[. = 'CAS']").click()
-        # 11 | type | name=Dept | cs
+        # 8 | type | name=Dept | cs
         self.driver.find_element(By.NAME, "Dept").send_keys("cs")
-        # 12 | type | name=Course | 411
+        # 9 | type | name=Course | 411
         self.driver.find_element(By.NAME, "Course").send_keys("411")
-        # 13 | click | css=td:nth-child(6) > input |
+        # 10 | click | css=td:nth-child(6) > input |
         self.driver.find_element(By.CSS_SELECTOR, "td:nth-child(6) > input").click()
+
+        # again back to initially generated code:
+        # 8 | click | linkText=Register for Class |
+        # self.driver.find_element(By.LINK_TEXT, "Register for Class").click()
+        # # 9 | click | name=College |
+        # self.driver.find_element(By.NAME, "College").click()
+        # # 10 | select | name=College | label=CAS
+        # dropdown = self.driver.find_element(By.NAME, "College")
+        # dropdown.find_element(By.XPATH, "//option[. = 'CAS']").click()
+        # # 11 | type | name=Dept | cs
+        # self.driver.find_element(By.NAME, "Dept").send_keys("cs")
+        # # 12 | type | name=Course | 411
+        # self.driver.find_element(By.NAME, "Course").send_keys("411")
+        # # 13 | click | css=td:nth-child(6) > input |
+        # self.driver.find_element(By.CSS_SELECTOR, "td:nth-child(6) > input").click()
