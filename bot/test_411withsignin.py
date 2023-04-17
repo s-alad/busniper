@@ -11,6 +11,9 @@ from selenium.webdriver.support import expected_conditions as expected_condition
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.firefox import GeckoDriverManager
+
 
 class Test411withsignin():
     load_dotenv()
@@ -22,7 +25,8 @@ class Test411withsignin():
         # keep the window open after test is done for debugging.
         options = Options()
         options.add_experimental_option("detach", True)
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+        #self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+        self.driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
 
         self.vars = {}
 
