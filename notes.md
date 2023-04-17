@@ -1,0 +1,1 @@
+https://bu.my.site.com/myBU/ makes a request to https://bu.my.site.com/myBU/s/ which makes a request to auth
