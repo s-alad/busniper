@@ -13,18 +13,22 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-username = os.getenv("USERNAME")
-password = os.getenv("PASSWORD")
+username = os.getenv("USER")
+password = os.getenv("PASS")
 
-entry = "https://bu.my.site.com/myBU/"
+entry = "https://bu.my.site.com/myBU/s/"
 
 def login(driver):
+    time.sleep(2)
+    print("Logging in...")
     #get element by id j_username
     try:
         user = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "j_username")))
         user.send_keys("saad7")
         passw = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "j_password")))
         passw.send_keys(password)
+        time.sleep(2)
+        print("Clicking button...")
         button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "_eventId_proceed")))
         button.click()
     except TimeoutException:
