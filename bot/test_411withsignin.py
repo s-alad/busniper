@@ -17,36 +17,22 @@ class Test411withsignin():
     password = os.getenv("PASS")
 
     def setup_method(self, method):
-        # keep the window open after test is done for debugging.
         options = Options()
+        # keep the window open after test is done for debugging.
         options.add_experimental_option("detach", True)
+
+        # use chrome profile as a workaround for cookies
+        chrome_profile_path = "saved-chrome-profile"
+        options.add_argument("user-data-dir={}".format(chrome_profile_path))
+
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
 
         self.vars = {}
 
     def teardown_method(self, method):
-        # save cookies here
-        self.save_cookies()
         # keep the window open after test is done for debugging.
-        # self.driver.quit()
+        self.driver.quit()
         pass
-
-    # try to load cookies - may not exist
-    def load_cookies(self):
-        if os.path.exists("cookies.json"):
-            print("Cookies exist, loading...")
-            cookies = json.load(open("cookies.json", "r"))
-            for cookie in cookies:
-                self.driver.add_cookie(cookie)
-            self.driver.refresh()
-        else:
-            print("No cookies found")
-
-    # save cookies to cookies.json
-    def save_cookies(self):
-        cookies = self.driver.get_cookies()
-        json.dump(cookies, open("cookies.json", "w"))
-
 
     def test_411withsignin(self):
         wait = WebDriverWait(self.driver, 30)  # lmfao 30 seconds timeout GOD DAMN student link is slow
@@ -56,9 +42,6 @@ class Test411withsignin():
         # Step # | name | target | value
         # 1 | open | https://student.bu.edu/MyBU/s/ |
         self.driver.get("https://student.bu.edu/MyBU/s/")
-
-        # add cookies from last session
-        self.load_cookies()
 
         # 2 | setWindowSize | 1440x819 |
         self.driver.set_window_size(1440, 819)
