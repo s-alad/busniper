@@ -1,19 +1,14 @@
+import json
 import os
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as expected_conditions
-
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
-
-from selenium.webdriver.firefox.service import Service as FirefoxService
-
-
-# from webdriver_manager.firefox import GeckoDriverManager
 
 
 class Test411withsignin():
@@ -22,18 +17,21 @@ class Test411withsignin():
     password = os.getenv("PASS")
 
     def setup_method(self, method):
-        print(self.username, self.password)
-        # keep the window open after test is done for debugging.
         options = Options()
+        # keep the window open after test is done for debugging.
         options.add_experimental_option("detach", True)
+
+        # use chrome profile as a workaround for cookies
+        chrome_profile_path = "saved-chrome-profile"
+        options.add_argument("user-data-dir={}".format(chrome_profile_path))
+
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-        # self.driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
 
         self.vars = {}
 
     def teardown_method(self, method):
         # keep the window open after test is done for debugging.
-        # self.driver.quit()
+        self.driver.quit()
         pass
 
     def test_411withsignin(self):
@@ -44,6 +42,7 @@ class Test411withsignin():
         # Step # | name | target | value
         # 1 | open | https://student.bu.edu/MyBU/s/ |
         self.driver.get("https://student.bu.edu/MyBU/s/")
+
         # 2 | setWindowSize | 1440x819 |
         self.driver.set_window_size(1440, 819)
 
