@@ -1,6 +1,12 @@
 from selenium import webdriver
+
 from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
+
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -39,15 +45,25 @@ def login(driver):
     except TimeoutException:
         print("Timed out waiting for page to load")
         driver.quit()
+    
+    finish = WebDriverWait(driver, 30).until(EC.presence_of_element_located(((By.CLASS_NAME, "community_navigation-tileMenuItemBanner_tileMenuItemBanner")))).click()
 
 if __name__ == "__main__":
-    options = webdriver.FirefoxOptions()
-    #options.add_argument("user-data-dir=cookies")
+    options = ChromeOptions()
+    options.add_experimental_option("detach", True) #add expirimental option to keep window open after test is done for debugging
+    
+    #add expirimental option to keep window open after test is done for debugging
+    
+    path = os.getcwd()
+    profile_path = path+"/bot/profile"
+    options.add_argument("user-data-dir={}".format(profile_path))
 
-    driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+
     driver.get(entry)
+    login(driver)
     #check if cookies exist in cookies.pkl
-    if os.path.exists("cookies.pkl"):
+    """ if os.path.exists("cookies.pkl"):
         print("Cookies exist, loading...")
         cookies = pickle.load(open("cookies.pkl", "rb"))
         for cookie in cookies:
@@ -59,3 +75,4 @@ if __name__ == "__main__":
         print("Cookies do not exist, logging in...")
         login(driver)
         getCookies(driver)
+ """

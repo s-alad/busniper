@@ -22,7 +22,8 @@ class Test411withsignin():
         options.add_experimental_option("detach", True)
 
         # use chrome profile as a workaround for cookies
-        chrome_profile_path = "saved-chrome-profile"
+        path = os.getcwd()
+        chrome_profile_path = path+"/bot/saved-chrome-profile"
         options.add_argument("user-data-dir={}".format(chrome_profile_path))
 
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)

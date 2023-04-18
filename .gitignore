@@ -2,3 +2,6 @@
 geckodriver.log
 cookies.pkl
 /bot/saved-chrome-profile/
+/saved-chrome-profile/
+/profile
+/bot/profile
