@@ -23,7 +23,7 @@ class Test411withsignin():
 
         # use chrome profile as a workaround for cookies
         path = os.getcwd()
-        chrome_profile_path = path+"/bot/saved-chrome-profile"
+        chrome_profile_path = path+"/saved-chrome-profile"
         options.add_argument("user-data-dir={}".format(chrome_profile_path))
 
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
