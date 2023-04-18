@@ -44,9 +44,6 @@ class Test411withsignin():
         # 1 | open | https://student.bu.edu/MyBU/s/ |
         self.driver.get("https://student.bu.edu/MyBU/s/")
 
-        # 2 | setWindowSize | 1440x819 |
-        self.driver.set_window_size(1440, 819)
-
         # self.driver.find_element(By.CSS_SELECTOR, ".comm-tile-menu__item-title-underline").click()
         wait.until(expected_conditions.presence_of_element_located((By.ID, "j_username")))
         # 3 | type | id=j_username | username
