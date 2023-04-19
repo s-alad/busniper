@@ -1,5 +1,6 @@
 import json
 import os
+import time
 
 from dotenv import load_dotenv
 from selenium import webdriver
@@ -23,7 +24,7 @@ class Test411withsignin():
 
         # use chrome profile as a workaround for cookies
         path = os.getcwd()
-        chrome_profile_path = path+"/saved-chrome-profile"
+        chrome_profile_path = path + "/saved-chrome-profile"
         options.add_argument("user-data-dir={}".format(chrome_profile_path))
 
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
@@ -32,11 +33,42 @@ class Test411withsignin():
 
     def teardown_method(self, method):
         # keep the window open after test is done for debugging.
-        self.driver.quit()
+        # self.driver.quit()
         pass
 
+    def remember_2fa(self, wait):
+        self.driver.switch_to.frame("duo_iframe")
+        # wait until we can click the cancel button
+        cancel_button = wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".btn-cancel")))
+        cancel_button.click()
+
+        # now there's a button overlaying the "remember me" checkbox
+        # we need to click it to get rid of it
+        dismiss = wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".medium-or-smaller")))
+        dismiss.click()
+
+        # 11 | click | name=dampen_choice |
+        remember_me = wait.until(expected_conditions.element_to_be_clickable((By.NAME, "dampen_choice")))
+        remember_me.click()
+
+        # 12 | click | css=fieldset:nth-child(1) > .push-label > .auth-button |
+        send_push = wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR,
+                                                                            "fieldset:nth-child(1) > .push-label > .auth-button")))
+        send_push.click()
+
+        # need to handle the following logic:
+        # 1. we're already remembered, so we don't need to wait for 2fa
+
+        # 2. we're not remembered, so we need to wait:
+        #   a. cancel the first 2fa request
+        #   b. click on the "remember me" checkbox
+        #   c. click on the "send me a push" button
+        #   d. wait until redirect
+
+        self.driver.switch_to.default_content()
+
     def test_411withsignin(self):
-        wait = WebDriverWait(self.driver, 30)  # lmfao 30 seconds timeout GOD DAMN student link is slow
+        wait = WebDriverWait(self.driver, 10)  # lmfao 30 seconds timeout GOD DAMN student link is slow
 
         # initial exported code:
         # Test name: 411-with-signin
@@ -53,9 +85,15 @@ class Test411withsignin():
         # 5 | click | name=_eventId_proceed |
         self.driver.find_element(By.NAME, "_eventId_proceed").click()
 
-        # after we've signed in, we need to wait for 2fa to go through. wait until redirect
-        # FIXME: we don't set "remember me" here so we have to wait for 2fa every time
-        wait.until(expected_conditions.url_changes("https://student.bu.edu/MyBU/s/"))
+        # after we get click sign in, two things can happen: we get redirected immediately,
+        # or need to set remember-me status.
+        # FIXME: Fuck this line
+        time.sleep(2)
+        redirect = expected_conditions.url_contains("https://student.bu.edu/MyBU/s/")(self.driver)
+        duo_repeat = expected_conditions.url_contains("https://shib.bu.edu/idp/profile/SAML2")(self.driver)
+
+        if duo_repeat:
+            self.remember_2fa(wait)
 
         # after redirect, we don't need to interact with the ui.
         # just navigate to the registration page immediately
