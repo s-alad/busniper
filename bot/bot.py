@@ -94,17 +94,12 @@ class Sniper:
     
     def register(self):
         driver = self.driver
-        #driver.get("https://www.bu.edu/link/bin/uiscgi_studentlink.pl/{}?ModuleName=regsched.pl")
-        panel = WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "community_navigation-tileMenuItem_tileMenuItem")))[0].click()
-
-        #get all hrefs urls on page
-        links = driver.find_elements_by_xpath("//a[@href]")
-        for link in links:
-            if "reg/option/" in link.get_attribute("href") and "Fall" in link.get_attribute("href"): 
-                link.click()
-                break
-
-        #select the link that contains the string 'reg/option/' and 'Fall'
+        panel = WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "community_navigation-tileMenuItem_tileMenuItem")))[0]
+        self.driver.get("https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1?ModuleName=reg/option/_start.pl&ViewSem=Fall%202023&KeySem=20243")
+        self.driver.get("https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1?ModuleName=reg%2Fadd%2F_start.pl&ViewSem=Fall%202023&KeySem=20243")
+        
+        dropdown = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.NAME, "College")))
+        dropdown.find_element(By.XPATH, "//option[. = 'CAS']").click()
 
 if __name__ == "__main__":
     bot = Sniper()
