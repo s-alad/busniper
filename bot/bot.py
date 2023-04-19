@@ -14,10 +14,12 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.wait import WebDriverWait
 
+from bs4 import BeautifulSoup
 import time
 import pickle
 import os
 import requests
+import collections ; collections.Callable = collections.abc.Callable
 
 from course import Course
 
@@ -68,7 +70,7 @@ class Sniper:
         #for cookie in driver.get_cookies(): print(cookie)
 
         driver.get("https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1?ModuleName=menu.pl&NewMenu=Academics")
-        time.sleep(3)
+        time.sleep(1)
         cookies_list = driver.get_cookies()
         for cookie in cookies_list:
             self.cookies = self.cookies + cookie['name'] + '=' + cookie['value'] + '; '
@@ -144,7 +146,18 @@ class Sniper:
     def snipe(self, uri):
         r = requests.get(uri, headers=self.headers())
         print(r.status_code)
-        print(r.text)
+        soup = BeautifulSoup(r.content, 'html5lib')
+        form = soup.find('form', attrs = {'name': 'SelectForm'})
+        table = form.find('table')
+        trs = table.find_all('tr')[3:]
+
+        for tr in trs:
+            tds = tr.find_all('td')
+            title = tds[3].text
+            seats = tds[5].text
+            types = tds[7].text
+            notes = tds[13].text
+            print(title, seats, types, notes)
 
 if __name__ == "__main__":
     bot = Sniper()
