@@ -21,7 +21,7 @@ class Section:
     classname = None
     titleinstructor = None
     openseats = None
-    credits = None
+    credithours = None
     classtype = None
     building = None
     room = None
@@ -30,31 +30,36 @@ class Section:
     stop = None
     notes = None
 
-    canadd = False
-
-    def __init__(self, marktoadd, classname, titleinstructor, openseats, credits, classtype, building, room, day, start, stop, notes):
+    def __init__(self, marktoadd, classname, titleinstructor, openseats, credithours, classtype, building, room, day, start, stop, notes):
         self.marktoadd = marktoadd
         self.classname = classname
         self.titleinstructor = titleinstructor
-        self.openseats = openseats
-        self.credits = credits
+        self.openseats = openseats.strip()
+        self.credithours = credithours
         self.classtype = classtype
         self.building = building
         self.room = room
         self.day = day
-        self.start = start
-        self.stop = stop
+        self.start = start.strip()
+        self.stop = stop.strip()
         self.notes = notes
     
     def __str__(self):
-        return f"{self.classname} {self.titleinstructor} {self.classtype} {self.building} {self.room} {self.day} {self.start} {self.stop}"
+        return f"{self.marktoadd} | {self.classname} | {self.titleinstructor} | {self.openseats} | {self.credithours} | {self.classtype} | {self.building} | {self.room} | {self.day} | {self.start} | {self.stop} | {self.notes}"
     
     def __repr__(self):
         return self.__str__()
     
     def can_add(self):
-        return self.canadd
-    
-    def set_can_add(self, canadd):
-        self.canadd = canadd
-    
+        """ print(str(self.notes).strip() +"|"+ self.openseats.strip()+"|")
+        print("------") """
+        """ print("Class Full"+"|"+str(self.notes).strip()+"|")
+        print("Full" in str(self.notes))
+        print("Class Full" == str(self.notes))
+        print("Class Full".__eq__(str(self.notes).strip())) """
+
+        if str(self.openseats) == "0":
+            return False
+        if "Full" in str(self.notes).strip() or "Full" == str(self.notes).strip():
+            return False
+        return True

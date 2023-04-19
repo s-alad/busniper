@@ -21,7 +21,7 @@ import os
 import requests
 import collections ; collections.Callable = collections.abc.Callable
 
-from course import Course
+from course import Course, Section
 
 from dotenv import load_dotenv
 
@@ -153,11 +153,23 @@ class Sniper:
 
         for tr in trs:
             tds = tr.find_all('td')
-            title = tds[3].text
-            seats = tds[5].text
-            types = tds[7].text
-            notes = tds[13].text
-            print(title, seats, types, notes)
+            mark = tds[0].text
+
+            section = Section(
+                marktoadd=mark, 
+                classname=tds[2].text, 
+                titleinstructor=tds[3].text, 
+                openseats=tds[5].text, 
+                credithours=tds[6].text, 
+                classtype=tds[7].text, 
+                building=tds[8].text, 
+                room=tds[9].text, 
+                day=tds[10].text, 
+                start=tds[11].text, 
+                stop=tds[12].text, 
+                notes=tds[13].text)
+            
+            print(section, ">" ,section.can_add())
 
 if __name__ == "__main__":
     bot = Sniper()
