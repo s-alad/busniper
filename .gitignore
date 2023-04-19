@@ -5,3 +5,4 @@ cookies.pkl
 /saved-chrome-profile/
 /profile
 /bot/profile
+__pycache__

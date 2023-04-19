@@ -17,6 +17,9 @@ from selenium.webdriver.support.wait import WebDriverWait
 import time
 import pickle
 import os
+import requests
+
+from course import Course
 
 from dotenv import load_dotenv
 
@@ -26,6 +29,8 @@ class Sniper:
     password = os.getenv("PASS")
     path = os.getcwd()
     entry = "https://student.bu.edu/MyBU/s/"
+    cookies = ""
+    biscuits = {}
 
     def __init__(self):
         options = ChromeOptions()
@@ -33,14 +38,42 @@ class Sniper:
         options.add_argument("user-data-dir={}".format(self.path+"/profile"))
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
 
+    def headers(self):
+        return {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/111.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Referer': 'https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1?',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Cookie': self.cookies,
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'same-origin',
+            'Sec-Fetch-User': '?1',
+            'Sec-GPC': '1',
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache',
+        }
+
     def getCookies(self):
         driver = self.driver
         #wait until url changes to https://student.bu.edu/MyBU/s/ to save cookies
-        WebDriverWait(driver, 30).until(EC.url_changes(self.entry))
-        finish = WebDriverWait(driver, 30).until(EC.presence_of_element_located(((By.CLASS_NAME, "community_navigation-tileMenuItemBanner_tileMenuItemBanner"))))
+        #WebDriverWait(driver, 30).until(EC.url_changes(self.entry))
+        #finish = WebDriverWait(driver, 30).until(EC.presence_of_element_located(((By.CLASS_NAME, "community_navigation-tileMenuItemBanner_tileMenuItemBanner"))))
         #save cookies to cookies.pkl
-        pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
-        for cookie in driver.get_cookies(): print(cookie)
+        #pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
+        #for cookie in driver.get_cookies(): print(cookie)
+
+        driver.get("https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1?ModuleName=menu.pl&NewMenu=Academics")
+        time.sleep(3)
+        cookies_list = driver.get_cookies()
+        for cookie in cookies_list:
+            self.cookies = self.cookies + cookie['name'] + '=' + cookie['value'] + '; '
+            self.biscuits[cookie['name']] = cookie['value']
+        print("COOKIES:", self.cookies)
 
     def login(self):
         driver = self.driver
@@ -92,16 +125,30 @@ class Sniper:
             self.login()
             self.getCookies()
     
-    def register(self):
+    def register(self, course: Course):
         driver = self.driver
-        panel = WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "community_navigation-tileMenuItem_tileMenuItem")))[0]
+        #panel = WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "community_navigation-tileMenuItem_tileMenuItem")))
         self.driver.get("https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1?ModuleName=reg/option/_start.pl&ViewSem=Fall%202023&KeySem=20243")
         self.driver.get("https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1?ModuleName=reg%2Fadd%2F_start.pl&ViewSem=Fall%202023&KeySem=20243")
-        
-        dropdown = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.NAME, "College")))
-        dropdown.find_element(By.XPATH, "//option[. = 'CAS']").click()
+
+        uri = "https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1?ModuleName=reg%2Fadd%2Fbrowse_schedule.pl&SearchOptionDesc=Class+Number&SearchOptionCd=S&ViewSem=Fall+2023&KeySem=20243&AddPlannerInd=&College={}&Dept={}&Course={}&Section={}".format(
+            course.college,
+            course.dept.lower(),
+            course.course,
+            course.section if course.section != None else ""
+        )
+        self.driver.get(uri)
+        time.sleep(1)
+        self.snipe(uri)
+    
+    def snipe(self, uri):
+        r = requests.get(uri, headers=self.headers())
+        print(r.status_code)
+        print(r.text)
 
 if __name__ == "__main__":
     bot = Sniper()
     bot.login()
-    bot.register()
+    bot.getCookies()
+    cs330 = Course("CAS", "CS", "330")
+    bot.register(cs330)
