@@ -1,5 +1,6 @@
 import json
 import os
+import time
 
 from dotenv import load_dotenv
 from selenium import webdriver
@@ -35,24 +36,7 @@ class Test411withsignin():
         # self.driver.quit()
         pass
 
-    def test_411withsignin(self):
-        wait = WebDriverWait(self.driver, 30)  # lmfao 30 seconds timeout GOD DAMN student link is slow
-
-        # initial exported code:
-        # Test name: 411-with-signin
-        # Step # | name | target | value
-        # 1 | open | https://student.bu.edu/MyBU/s/ |
-        self.driver.get("https://student.bu.edu/MyBU/s/")
-
-        # self.driver.find_element(By.CSS_SELECTOR, ".comm-tile-menu__item-title-underline").click()
-        wait.until(expected_conditions.presence_of_element_located((By.ID, "j_username")))
-        # 3 | type | id=j_username | username
-        self.driver.find_element(By.ID, "j_username").send_keys(self.username)
-        # 4 | type | id=j_password | password
-        self.driver.find_element(By.ID, "j_password").send_keys(self.password)
-        # 5 | click | name=_eventId_proceed |
-        self.driver.find_element(By.NAME, "_eventId_proceed").click()
-
+    def remember_2fa(self, wait):
         self.driver.switch_to.frame("duo_iframe")
         # wait until we can click the cancel button
         cancel_button = wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".btn-cancel")))
@@ -82,9 +66,34 @@ class Test411withsignin():
         #   d. wait until redirect
 
         self.driver.switch_to.default_content()
-        # after we've signed in, we need to wait for 2fa to go through. wait until redirect
-        # FIXME: we don't set "remember me" here so we have to wait for 2fa every time
-        wait.until(expected_conditions.url_changes("https://student.bu.edu/MyBU/s/"))
+
+    def test_411withsignin(self):
+        wait = WebDriverWait(self.driver, 10)  # lmfao 30 seconds timeout GOD DAMN student link is slow
+
+        # initial exported code:
+        # Test name: 411-with-signin
+        # Step # | name | target | value
+        # 1 | open | https://student.bu.edu/MyBU/s/ |
+        self.driver.get("https://student.bu.edu/MyBU/s/")
+
+        # self.driver.find_element(By.CSS_SELECTOR, ".comm-tile-menu__item-title-underline").click()
+        wait.until(expected_conditions.presence_of_element_located((By.ID, "j_username")))
+        # 3 | type | id=j_username | username
+        self.driver.find_element(By.ID, "j_username").send_keys(self.username)
+        # 4 | type | id=j_password | password
+        self.driver.find_element(By.ID, "j_password").send_keys(self.password)
+        # 5 | click | name=_eventId_proceed |
+        self.driver.find_element(By.NAME, "_eventId_proceed").click()
+
+        # after we get click sign in, two things can happen: we get redirected immediately,
+        # or need to set remember-me status.
+        # FIXME: Fuck this line
+        time.sleep(2)
+        redirect = expected_conditions.url_contains("https://student.bu.edu/MyBU/s/")(self.driver)
+        duo_repeat = expected_conditions.url_contains("https://shib.bu.edu/idp/profile/SAML2")(self.driver)
+
+        if duo_repeat:
+            self.remember_2fa(wait)
 
         # after redirect, we don't need to interact with the ui.
         # just navigate to the registration page immediately
