@@ -26,14 +26,14 @@ class Sniper:
     username = os.getenv("USER")
     password = os.getenv("PASS")
     path = os.getcwd()
-    entry = "https://student.bu.edu/MyBU/s/"
+    entry_link = "https://student.bu.edu/MyBU/s/"
     cookies = ""
     biscuits = {}
 
     def __init__(self):
         options = ChromeOptions()
-        options.add_experimental_option("detach",
-                                        True)  # add expirimental option to keep window open after test is done for debugging
+        # add expirimental option to keep window open after test is done for debugging
+        options.add_experimental_option("detach", True)
         options.add_argument("user-data-dir={}".format(self.path + "/profile"))
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
         self.wait_10 = WebDriverWait(self.driver, 10)
@@ -78,7 +78,7 @@ class Sniper:
 
     def login(self):
         driver = self.driver
-        driver.get(self.entry)
+        driver.get(self.entry_link)
         print("Logging in...")
         try:
             self.wait_10.until(EC.presence_of_element_located((By.ID, "j_username"))).send_keys(
@@ -92,29 +92,48 @@ class Sniper:
             print("switched to shibboleth")
 
             # check if url is now https://student.bu.edu/MyBU/s/ otherwise go to duo() function
-            time.sleep(5)
+            time.sleep(2)
             if driver.current_url == "https://student.bu.edu/MyBU/s/":
                 print("DUO NOT NEEDED")
                 pass
             else:
-                self.duo()
+                self.duo_remember()
             print("Login successful")
         except TimeoutException:
             print("Timed out waiting for page to load")
             driver.quit()
 
-        finish = WebDriverWait(driver, 30).until(EC.presence_of_element_located(
-            ((By.CLASS_NAME, "community_navigation-tileMenuItemBanner_tileMenuItemBanner"))))
+        WebDriverWait(driver, 30).until(EC.presence_of_element_located(
+            (By.CLASS_NAME, "community_navigation-tileMenuItemBanner_tileMenuItemBanner")))
 
-    def duo(self):
-        driver = self.driver
+    def duo_remember(self) -> None:
+        """
+        This function is called when the user has duo enabled, and this session is not previously authorized.
+        It will cancel the first request, and then click the "remember me" button, and then send the second request.
+        There may be a way to programmatically set 2fa to remember me, but I haven't found it yet.
+        :return: None
+        """
         try:
+            # wait for the duo wrapper to load
             self.wait_30.until(EC.frame_to_be_available_and_switch_to_it((By.ID, "duo_iframe")))
-            self.wait_30.until(EC.presence_of_element_located((By.NAME, "dampen_choice"))).click()
-            self.wait_30.until(EC.presence_of_element_located((By.ID, "passcode")))
-            auth_buttons = self.wait_30.until(
-                EC.presence_of_all_elements_located((By.CLASS_NAME, "auth-button")))
-            push = auth_buttons[0].click()
+            # cancel the current request - we want to select "remember me" first
+            cancel_button = self.wait_30.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".btn-cancel")))
+            cancel_button.click()
+
+            # now that we've cancelled, there's a button blocking the "remember me" button.
+            # dismiss it.
+            dismiss = self.wait_10.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".medium-or-smaller")))
+            dismiss.click()
+
+            # finally, click the "remember me" button
+            remember_me = self.wait_10.until(EC.element_to_be_clickable((By.NAME, "dampen_choice")))
+            remember_me.click()
+
+            # send the push notification
+            send_push = self.wait_10.until(EC.element_to_be_clickable((By.CSS_SELECTOR,
+                                                                       "fieldset:nth-child(1) > .push-label > .auth-button")))
+            send_push.click()
+            self.driver.switch_to.default_content()
         except Exception as e:
             print(e)
 
@@ -153,7 +172,7 @@ class Sniper:
     def snipe(self, uri):
         r = requests.get(uri, headers=self.headers())
         print(r.status_code)
-        soup = BeautifulSoup(r.content, 'html5lib')
+        soup = BeautifulSoup(r.content, 'html.parser')  # html5lib didn't work for me :(
         form = soup.find('form', attrs={'name': 'SelectForm'})
         table = form.find('table')
         trs = table.find_all('tr')[3:]
