@@ -32,12 +32,13 @@ class Sniper:
 
     def __init__(self):
         options = ChromeOptions()
-        # add expirimental option to keep window open after test is done for debugging
+        # add experimental option to keep window open after test is done for debugging
         options.add_experimental_option("detach", True)
         options.add_argument("user-data-dir={}".format(self.path + "/profile"))
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
         self.wait_10 = WebDriverWait(self.driver, 10)
         self.wait_30 = WebDriverWait(self.driver, 30)
+        self.wait = WebDriverWait(self.driver, 5)
 
     def headers(self):
         return {
@@ -59,7 +60,7 @@ class Sniper:
             'Cache-Control': 'no-cache',
         }
 
-    def getCookies(self):
+    def get_cookies(self):
         driver = self.driver
         # wait until url changes to https://student.bu.edu/MyBU/s/ to save cookies
         # WebDriverWait(driver, 30).until(EC.url_changes(self.entry))
@@ -92,19 +93,20 @@ class Sniper:
             print("switched to shibboleth")
 
             # check if url is now https://student.bu.edu/MyBU/s/ otherwise go to duo() function
-            time.sleep(2)
+            time.sleep(3)
             if driver.current_url == "https://student.bu.edu/MyBU/s/":
                 print("DUO NOT NEEDED")
                 pass
             else:
+                print("DUO NEEDED")
                 self.duo_remember()
             print("Login successful")
         except TimeoutException:
             print("Timed out waiting for page to load")
             driver.quit()
 
-        WebDriverWait(driver, 30).until(EC.presence_of_element_located(
-            (By.CLASS_NAME, "community_navigation-tileMenuItemBanner_tileMenuItemBanner")))
+        self.driver.get(
+            "https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1?ModuleName=reg/option/_start.pl&ViewSem=Fall%202023&KeySem=20243")
 
     def duo_remember(self) -> None:
         """
@@ -113,31 +115,34 @@ class Sniper:
         There may be a way to programmatically set 2fa to remember me, but I haven't found it yet.
         :return: None
         """
+        # wait for the duo wrapper to load
+        self.wait_30.until(EC.frame_to_be_available_and_switch_to_it((By.ID, "duo_iframe")))
+
+        # cancel the current request - we want to select "remember me" first
+        # however, sometimes this never happens haha. fuck you duo
         try:
-            # wait for the duo wrapper to load
-            self.wait_30.until(EC.frame_to_be_available_and_switch_to_it((By.ID, "duo_iframe")))
-            # cancel the current request - we want to select "remember me" first
-            cancel_button = self.wait_30.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".btn-cancel")))
+            self.wait._timeout = 3
+            cancel_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".btn-cancel")))
             cancel_button.click()
 
             # now that we've cancelled, there's a button blocking the "remember me" button.
             # dismiss it.
-            dismiss = self.wait_10.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".medium-or-smaller")))
+            dismiss = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".medium-or-smaller")))
             dismiss.click()
+        except TimeoutException as timeout:
+            print("No cancel button found! Continuing...")
 
-            # finally, click the "remember me" button
-            remember_me = self.wait_10.until(EC.element_to_be_clickable((By.NAME, "dampen_choice")))
-            remember_me.click()
+        # finally, click the "remember me" button
+        remember_me = self.wait_10.until(EC.element_to_be_clickable((By.NAME, "dampen_choice")))
+        remember_me.click()
 
-            # send the push notification
-            send_push = self.wait_10.until(EC.element_to_be_clickable((By.CSS_SELECTOR,
-                                                                       "fieldset:nth-child(1) > .push-label > .auth-button")))
-            send_push.click()
-            self.driver.switch_to.default_content()
-        except Exception as e:
-            print(e)
+        # send the push notification
+        send_push = self.wait_10.until(EC.element_to_be_clickable((By.CSS_SELECTOR,
+                                                                   "fieldset:nth-child(1) > .push-label > .auth-button")))
+        send_push.click()
+        self.driver.switch_to.default_content()
 
-    def cookieLogin(self):
+    def cookie_login(self):
         driver = self.driver
         if os.path.exists("cookies.pkl"):
             print("Cookies exist, loading...")
@@ -149,7 +154,7 @@ class Sniper:
         else:
             print("Cookies do not exist, logging in...")
             self.login()
-            self.getCookies()
+            self.get_cookies()
 
     def register(self, course: Course):
         driver = self.driver
@@ -201,6 +206,6 @@ class Sniper:
 if __name__ == "__main__":
     bot = Sniper()
     bot.login()
-    bot.getCookies()
+    bot.get_cookies()
     cs330 = Course("CAS", "CS", "330")
     bot.register(cs330)
