@@ -51,13 +51,6 @@ class Section:
         return self.__str__()
     
     def can_add(self):
-        """ print(str(self.notes).strip() +"|"+ self.openseats.strip()+"|")
-        print("------") """
-        """ print("Class Full"+"|"+str(self.notes).strip()+"|")
-        print("Full" in str(self.notes))
-        print("Class Full" == str(self.notes))
-        print("Class Full".__eq__(str(self.notes).strip())) """
-
         if str(self.openseats) == "0":
             return False
         if "Full" in str(self.notes).strip() or "Full" == str(self.notes).strip():
