@@ -56,15 +56,6 @@ class Test411withsignin():
                                                                             "fieldset:nth-child(1) > .push-label > .auth-button")))
         send_push.click()
 
-        # need to handle the following logic:
-        # 1. we're already remembered, so we don't need to wait for 2fa
-
-        # 2. we're not remembered, so we need to wait:
-        #   a. cancel the first 2fa request
-        #   b. click on the "remember me" checkbox
-        #   c. click on the "send me a push" button
-        #   d. wait until redirect
-
         self.driver.switch_to.default_content()
 
     def test_411withsignin(self):
