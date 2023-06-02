@@ -20,7 +20,8 @@ import time
 import pickle
 import os
 import requests
-import collections ; collections.Callable = collections.abc.Callable
+import collections
+from api import Ping ; collections.Callable = collections.abc.Callable
 
 from course import Course, Section
 
@@ -112,6 +113,15 @@ class Sniper:
         except Exception as e:
             print(e)
     
+    def revalidate(self, courses: list[Course]) -> list[Ping]:
+        self.close()
+        self.login()
+        self.getCookies()
+        pings = []
+        for course in courses:
+            bot.register(course)
+        
+
     # currently uneeded due to chrome profile
     def cookieLogin(self):
         driver = self.driver
@@ -141,9 +151,8 @@ class Sniper:
         )
         self.driver.get(uri)
         time.sleep(1)
-        self.snipe(uri, course)
-
-        return 
+        #self.snipe(uri, course)
+        #return 
         
         data = {
             "uri": uri,

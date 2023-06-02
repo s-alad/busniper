@@ -1,0 +1,17 @@
+{
+    "CAS CS 411 A1" : {
+        "subscribers" : [
+            {
+                "email" : "xyz@gmail.com",
+                "phone" : "xyz",
+                "registered" : "false"
+            },
+            {
+                "email" : "abc@gmail.com",
+                "phone" : "abc",
+                "registered" : "false"
+            }
+
+        ]
+    }
+}
