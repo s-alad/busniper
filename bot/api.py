@@ -1,12 +1,13 @@
 from bs4 import BeautifulSoup
-import collections ; collections.Callable = collections.abc.Callable
+import collections
+
+from bot.models.section import Section ; collections.Callable = collections.abc.Callable
 from flask import Flask
 from flask import request
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 
-from course import Course, Section
 from bot import Sniper
 from models.ping import Ping
 

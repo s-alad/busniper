@@ -24,7 +24,8 @@ import collections
 from models.ping import Ping
 collections.Callable = collections.abc.Callable
 
-from course import Course, Section
+from models.course import Course
+from models.section import Section
 
 from dotenv import load_dotenv
 
