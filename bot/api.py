@@ -13,6 +13,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 
 from course import Course, Section
+from bot import Sniper
 
 app = Flask(__name__)
 

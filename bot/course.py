@@ -50,6 +50,10 @@ class Section:
     def __repr__(self):
         return self.__str__()
     
+    def is_section(self, section: str):
+        if section == None: return True
+        return self.classname.replace(u'\xa0', u' ').split(" ")[2] == section
+    
     def can_add(self):
         if str(self.openseats) == "0":
             return False

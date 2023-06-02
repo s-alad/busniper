@@ -141,7 +141,9 @@ class Sniper:
         )
         self.driver.get(uri)
         time.sleep(1)
-        #self.snipe(uri)
+        self.snipe(uri, course)
+
+        return 
         
         data = {
             "uri": uri,
@@ -152,7 +154,7 @@ class Sniper:
         print(jsondata)
         print(r.text)
     
-    def snipe(self, uri):
+    def snipe(self, uri, course: Course):
         r = requests.get(uri, headers=self.headers())
         print(r.status_code)
         soup = BeautifulSoup(r.content, 'html5lib')
@@ -178,7 +180,9 @@ class Sniper:
                 stop=tds[12].text, 
                 notes=tds[13].text)
             
-            print(section, ">" ,section.can_add())
+            if section.is_section(course.section):
+                print(section, "||| can add: " ,section.can_add())
+                break
 
     def close(self):
         self.driver.quit()
@@ -187,9 +191,13 @@ if __name__ == "__main__":
     bot = Sniper()
     bot.login()
     bot.getCookies()
-    cs330 = Course("CAS", "CS", "330")
-    bot.register(cs330)
-    cs237 = Course("CAS", "CS", "237")
-    bot.register(cs237)
-    #bot.getCookies()
+    #cs330 = Course("CAS", "CS", "330")
+    #bot.register(cs330)
+    #cs237 = Course("CAS", "CS", "237")
+    #bot.register(cs237)
+    
+    cs411 = Course("CAS", "CS", "411", "A1")
+    bot.register(cs411)
+
+
     bot.close()
