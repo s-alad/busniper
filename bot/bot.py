@@ -158,7 +158,8 @@ class Sniper:
         
         data = {
             "uri": uri,
-            "headers": self.headers()
+            "headers": self.headers(),
+            "course": str(course)
         }
         jsondata = json.dumps(data)
         r = requests.post("http://localhost:5000/add", data=jsondata, headers={ "Content-Type": "application/json" })
