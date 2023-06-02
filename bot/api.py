@@ -1,3 +1,4 @@
+import os
 from bs4 import BeautifulSoup
 import collections
 collections.Callable = collections.abc.Callable
@@ -10,11 +11,19 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import time
 import requests
 import atexit
+import redis
 
 from bot import Sniper
 from models.ping import Ping
 from models.section import Section
 from models.course import Course
+
+from dotenv import load_dotenv
+
+#===================================================================================================
+
+load_dotenv()
+redispassword = os.getenv('REDISPASSWORD')
 
 #===================================================================================================
 
@@ -61,8 +70,9 @@ atexit.register(teardown)
 
 if __name__ == '__main__':
     scheduler.start()
-    bot = Sniper()
-    bot.login()
-    bot.getCookies()
-    app.run(debug=False)
+    bot = None
+    #bot = Sniper()
+    ##bot.login()
+    #bot.getCookies()
+    #app.run(debug=False)
 
