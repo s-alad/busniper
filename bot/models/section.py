@@ -1,3 +1,8 @@
+
+
+from models.course import Course
+
+
 class Section:
     marktoadd = None
     classname = None
@@ -27,14 +32,16 @@ class Section:
         self.notes = notes
     
     def __str__(self):
-        return f"{self.marktoadd} | {self.classname} | {self.titleinstructor} | {self.openseats} | {self.credithours} | {self.classtype} | {self.building} | {self.room} | {self.day} | {self.start} | {self.stop} | {self.notes}"
+        return f"| {self.classname} | {self.titleinstructor} | {self.openseats} | {self.credithours} | {self.classtype} | {self.building} | {self.room} | {self.day} | {self.start} | {self.stop} | {self.notes}"
     
     def __repr__(self):
         return self.__str__()
     
-    def is_section(self, section: str):
-        if section == None: return True
-        return self.classname.replace(u'\xa0', u' ').split(" ")[2] == section
+    def valid(self, course: Course):
+        if course.section == None: return True
+        validsection = self.classname.replace(u'\xa0', u' ').split(" ")[2] == course.section
+        validcourse = self.classname.replace(u'\xa0', u' ').split(" ")[1] == course.dept+course.course
+        return validsection and validcourse
     
     def can_add(self):
         if str(self.openseats) == "0":

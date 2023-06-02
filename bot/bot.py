@@ -74,10 +74,11 @@ class Sniper:
         for cookie in cookies_list:
             self.cookies = self.cookies + cookie['name'] + '=' + cookie['value'] + '; '
             self.biscuits[cookie['name']] = cookie['value']
-        print("-------" * 5)
-        print("COOKIES:", self.cookies)
-        print("BISCUITS:", self.biscuits)
-        print("-------" * 5)
+        print("Fetched and saved Cookies")
+        #print("-------" * 5)
+        #print("COOKIES:", self.cookies)
+        #print("BISCUITS:", self.biscuits)
+        #print("-------" * 5)
 
     def login(self):
         driver = self.driver
@@ -153,48 +154,53 @@ class Sniper:
         )
         self.driver.get(uri)
         time.sleep(1)
+
+        return uri
+
         #self.snipe(uri, course)
         #return 
         
-        data = {
-            "uri": uri,
-            "headers": self.headers(),
-            "course": str(course)
-        }
-        jsondata = json.dumps(data)
-        r = requests.post("http://localhost:5000/add", data=jsondata, headers={ "Content-Type": "application/json" })
-        print(jsondata)
-        print(r.text)
+        #data = {
+        #    "uri": uri,
+        #    "headers": self.headers(),
+        #    "course": str(course)
+        #}
+        #jsondata = json.dumps(data)
+        #r = requests.post("http://localhost:5000/add", data=jsondata, headers={ "Content-Type": "application/json" })
+        #print(jsondata)
+        #print(r.text)
     
     def snipe(self, uri, course: Course):
         r = requests.get(uri, headers=self.headers())
-        print(r.status_code)
         soup = BeautifulSoup(r.content, 'html5lib')
         form = soup.find('form', attrs = {'name': 'SelectForm'})
         table = form.find('table')
-        trs = table.find_all('tr')[3:]
+        trs = table.find_all('tr')[1:]
 
         for tr in trs:
-            tds = tr.find_all('td')
-            mark = tds[0].text
+            try:
+                tds = tr.find_all('td')
 
-            section = Section(
-                marktoadd=mark, 
-                classname=tds[2].text, 
-                titleinstructor=tds[3].text, 
-                openseats=tds[5].text, 
-                credithours=tds[6].text, 
-                classtype=tds[7].text, 
-                building=tds[8].text, 
-                room=tds[9].text, 
-                day=tds[10].text, 
-                start=tds[11].text, 
-                stop=tds[12].text, 
-                notes=tds[13].text)
-            
-            if section.is_section(course.section):
-                print(section, "||| can add: " ,section.can_add())
-                break
+                section = Section(
+                    marktoadd=tds[0].text, 
+                    classname=tds[2].text, 
+                    titleinstructor=tds[3].text, 
+                    openseats=tds[5].text, 
+                    credithours=tds[6].text, 
+                    classtype=tds[7].text, 
+                    building=tds[8].text, 
+                    room=tds[9].text, 
+                    day=tds[10].text, 
+                    start=tds[11].text, 
+                    stop=tds[12].text, 
+                    notes=tds[13].text)
+                
+                if section.valid(course):
+                    print(section, "||| open: " ,section.can_add())
+                    break
+            except Exception as e:
+                #print("INVALID ROW EXCEPTION")
+                continue
 
     def close(self):
         self.driver.quit()
@@ -203,13 +209,6 @@ if __name__ == "__main__":
     bot = Sniper()
     bot.login()
     bot.getCookies()
-    #cs330 = Course("CAS", "CS", "330")
-    #bot.register(cs330)
-    #cs237 = Course("CAS", "CS", "237")
-    #bot.register(cs237)
-    
     cs411 = Course("CAS", "CS", "411", "A1")
     bot.register(cs411)
-
-
     bot.close()

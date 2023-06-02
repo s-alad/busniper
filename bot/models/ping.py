@@ -1,7 +1,7 @@
 class Ping:
-    def __init__(self, uri, headers, course):
+    def __init__(self, uri, course):
         self.uri = uri
-        self.headers = headers
+        #self.headers = headers
         self.course = course
 
     def __str__(self):
