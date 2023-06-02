@@ -1,9 +1,3 @@
-class Ping:
-    def __init__(self, uri, headers):
-        self.uri = uri
-        self.headers = headers
-
-
 from bs4 import BeautifulSoup
 import collections ; collections.Callable = collections.abc.Callable
 from flask import Flask
@@ -14,6 +8,7 @@ import requests
 
 from course import Course, Section
 from bot import Sniper
+from models.ping import Ping
 
 app = Flask(__name__)
 

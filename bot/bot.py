@@ -21,7 +21,8 @@ import pickle
 import os
 import requests
 import collections
-from api import Ping ; collections.Callable = collections.abc.Callable
+from models.ping import Ping
+collections.Callable = collections.abc.Callable
 
 from course import Course, Section
 
