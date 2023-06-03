@@ -12,22 +12,11 @@ from models.course import Course
 dotenv.load_dotenv()
 
 redispassword = os.getenv('REDISPASSWORD') #os.getenv('RAILWAYREDIS') 
-""" red = redis.Redis(
-    host='containers-us-west-132.railway.app',
-    password=redispassword,
-    port=6696,
-) """
-
 red = redis.Redis(
     host='redis-18876.c232.us-east-1-2.ec2.cloud.redislabs.com',
     port=18876,
     password=redispassword
 ) 
-
-
-cascs411 = {
-    "subscribers" : [ "xyz@gmail.com", "abc@gmail.com"]
-}
 
 #generally takes .2s to add and .07s to fetch
 def add():
