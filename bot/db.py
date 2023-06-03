@@ -19,8 +19,11 @@ red = redis.Redis(
 ) 
 
 #generally takes .2s to add and .07s to fetch
-def add():
-    ...
+def get_pings():
+    return red.json().get("Pings")
+
+def add_ping(ping: Ping):
+    return red.json().arrappend("Pings", "$", ping)
 
 def get_all_courses():
     c = red.json().get("Courses")
@@ -42,7 +45,7 @@ end = time.time()
 print(end - start) """
 
 #print(add_course(Course("CAS", "CS", "112", "A1")))
-print(add_subscriber(Course("CAS", "CS", "112", "A1"), "lol@lol.com"))
+#print(add_subscriber(Course("CAS", "CS", "112", "A1"), "lol@lol.com"))
 
-
-#print(red.json().get(str(Course("CAS", "CS", "237", "A1"))))
+#print(get_pings())
+#print(add_ping(Ping("test.com", Course("CAS", "CS", "112", "A1")).__dict__()))

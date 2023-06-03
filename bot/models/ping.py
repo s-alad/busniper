@@ -9,3 +9,17 @@ class Ping:
 
     def __repr__(self):
         return self.__str__()
+    
+    def __dict__(self):
+        return {
+            "uri": self.uri,
+            #"headers": self.headers,
+            "course": str(self.course)
+        }
+    
+    def obj(self):
+        return {
+            "uri": self.uri,
+            #"headers": self.headers,
+            "course": self.course
+        }
