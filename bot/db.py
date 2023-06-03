@@ -26,7 +26,7 @@ class Database:
         return self.red.json().get("Pings")
 
     def add_ping(self, ping: Ping):
-        return self.red.json().arrappend("Pings", "$", ping)
+        return self.red.json().arrappend("Pings", "$", ping.__dict__())
 
     def get_all_courses(self):
         return self.red.json().get("Courses")

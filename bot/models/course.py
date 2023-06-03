@@ -4,11 +4,11 @@ class Course:
     course = None
     section = None
 
-    def __init__(self, college: str, dept: str, course: str, section=None):
+    def __init__(self, college: str, dept: str, course: str, section: str):
         self.college = college
         self.dept = dept
         self.course = course
-        self.section = section if section else None
+        self.section = section
 
     def __str__(self):
         return f"{self.college}-{self.dept}-{self.course}-{self.section}"

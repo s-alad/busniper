@@ -1,6 +1,7 @@
 import os
 from bs4 import BeautifulSoup
 import collections
+
 collections.Callable = collections.abc.Callable
 
 from flask import Flask
@@ -17,6 +18,7 @@ from bot import Sniper
 from models.ping import Ping
 from models.section import Section
 from models.course import Course
+from db import Database
 
 from dotenv import load_dotenv
 
@@ -29,30 +31,24 @@ redispassword = os.getenv('REDISPASSWORD')
 
 app = Flask(__name__)
 
-queue = []
-
 def recur():
-    print("current queue", queue)
-    for ping in queue:
-        bot.snipe(ping.uri, ping.course)
+    pings = db.get_pings()
+    print("current queue =====================")
+    print(*pings, sep = "\n")
     print("-----------------------------------")
+    for ping in pings:
 
-#@app.route('/add', methods=['POST'])
-def add(uri, course):
-    #data = request.get_json()
-    #uri = data['uri']
-    #headers = data['headers']
-    #course: Course = data['course']
+        p = Ping(ping["uri"], Course.unwrap(ping["course"]))
+        bot.snipe(p)
 
-    queue.append(Ping(uri, course))
-    return "OK"
+    print("===================================")
 
 @app.route('/register/<college>/<dept>/<course>/<section>')
 def register(college: str, dept: str, course: str, section: str):
-    course = Course(college, dept, course, section if section != "" else None)
+    course = Course(college, dept, course, section)
     uri = bot.register(course)
 
-    add(uri, course)
+    db.add_ping(Ping(uri, course))
 
     return "Registered for " + str(course)
 
@@ -70,9 +66,10 @@ atexit.register(teardown)
 
 if __name__ == '__main__':
     scheduler.start()
-    bot = None
-    #bot = Sniper()
-    ##bot.login()
-    #bot.getCookies()
-    #app.run(debug=False)
+    db = Database()
+    
+    bot = Sniper()
+    bot.login()
+    bot.getCookies()
+    app.run(debug=False)
 

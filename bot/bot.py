@@ -170,8 +170,14 @@ class Sniper:
         #print(jsondata)
         #print(r.text)
     
-    def snipe(self, uri, course: Course):
+    def snipe(self, ping: Ping):
+
+        uri = ping.uri
+        course = ping.course
+
         r = requests.get(uri, headers=self.headers())
+        print("STATUS CODE:", r.status_code)
+        print(r.text)
         soup = BeautifulSoup(r.content, 'html5lib')
         form = soup.find('form', attrs = {'name': 'SelectForm'})
         table = form.find('table')
