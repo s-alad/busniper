@@ -1,17 +1,22 @@
 {
-    "CAS CS 411 A1" : {
-        "subscribers" : [
-            {
-                "email" : "xyz@gmail.com",
-                "phone" : "xyz",
-                "registered" : "false"
-            },
-            {
-                "email" : "abc@gmail.com",
-                "phone" : "abc",
-                "registered" : "false"
-            }
-
-        ]
-    }
+    "courses" : {
+        "CAS-CS-411-A1" : {
+            "subscribers" : [ "xyz@gmail.com", "abc@gmail.com"]
+        }
+    },
+    "users" : {
+        "xyz@gmail.com" : {
+            "active-courses" : [ "CAS CS 411 A1" ],
+            "inactive-courses" : [ "CAS CS 237 A1" ],
+            "credit" : 0,
+            "number" : "6179997777",
+            "email" : "xyz@gmail.com"
+        }
+    },
+    "pings" : [
+        {
+            "url" : "xyz.com",
+            "course" : "stringified course"
+        }
+    ]
 }

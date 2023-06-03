@@ -11,8 +11,11 @@ class Course:
         self.section = section if section else None
 
     def __str__(self):
-        return f"{self.college} {self.dept} {self.course} {self.section}"
+        return f"{self.college}-{self.dept}-{self.course}-{self.section}"
     
     def __repr__(self):
         return self.__str__()
     
+    @staticmethod
+    def unwrap(course: str):
+        return Course(*course.split("-"))
