@@ -65,11 +65,17 @@ def teardown():
 atexit.register(teardown)
 
 if __name__ == '__main__':
-    scheduler.start()
     db = Database()
+    db.clear_pings()
     
     bot = Sniper()
     bot.login()
     bot.getCookies()
+
+    watchlist = [Course.unwrap(course) for course in db.get_all_course_names()]
+    print(watchlist)
+
+    scheduler.start()
+
     app.run(debug=False)
 

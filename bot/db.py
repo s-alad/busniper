@@ -22,12 +22,18 @@ class Database:
     def __init__(self):
         pass
 
+    def clear_pings(self):
+        self.red.json().clear("Pings")
+
     def get_pings(self):
         return self.red.json().get("Pings")
 
     def add_ping(self, ping: Ping):
         return self.red.json().arrappend("Pings", "$", ping.__dict__())
-
+    
+    def get_all_course_names(self):
+        return list(self.red.json().get("Courses").keys())
+    
     def get_all_courses(self):
         return self.red.json().get("Courses")
         
@@ -42,4 +48,8 @@ class Database:
 
 if __name__ == "__main__":
     db = Database()
-    print(db.get_all_courses())
+    print(db.clear_pings())
+    watchlist = [Course.unwrap(course) for course in db.get_all_course_names()]
+    print(watchlist)
+    for c in watchlist:
+        print(c.college, c.dept, c.course, c.section)
