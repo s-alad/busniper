@@ -31,6 +31,9 @@ class Database:
     def add_ping(self, ping: Ping):
         return self.red.json().arrappend("Pings", "$", ping.__dict__())
     
+    def add_pings(self, pings: list[Ping]):
+        for ping in pings: self.add_ping(ping)
+    
     def get_all_course_names(self):
         return list(self.red.json().get("Courses").keys())
     

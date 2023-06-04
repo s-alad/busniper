@@ -73,7 +73,8 @@ if __name__ == '__main__':
     bot.getCookies()
 
     watchlist = [Course.unwrap(course) for course in db.get_all_course_names()]
-    print(watchlist)
+    pings = bot.generator(watchlist)
+    db.add_pings(pings)
 
     scheduler.start()
 

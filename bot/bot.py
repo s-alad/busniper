@@ -123,7 +123,6 @@ class Sniper:
         pings = []
         for course in courses:
             bot.register(course)
-        
 
     # currently uneeded due to chrome profile
     def cookieLogin(self):
@@ -207,6 +206,12 @@ class Sniper:
             except Exception as e:
                 #print("INVALID ROW EXCEPTION")
                 continue
+
+    def generator(self, courses):
+        for course in courses:
+            uri = self.register(course)
+            yield Ping(uri, course)
+    
 
     def close(self):
         self.driver.quit()
