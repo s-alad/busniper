@@ -1,7 +1,7 @@
 import smtplib
 from email.message import EmailMessage
 
-class Email:
+class Mail:
     def __init__(self):
         msg = EmailMessage()
         s = smtplib.SMTP('localhost')

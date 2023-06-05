@@ -15,9 +15,11 @@ import atexit
 import redis
 
 from bot import Sniper
+from mail import Mail
 from models.ping import Ping
 from models.section import Section
 from models.course import Course
+
 from db import Database
 
 from dotenv import load_dotenv
@@ -31,6 +33,19 @@ redispassword = os.getenv('REDISPASSWORD')
 
 app = Flask(__name__)
 
+
+def found(p: Ping):
+    print("found empty seat for " + str(p))
+    subscribers = db.get_course(p.course)["subscribers"]
+    #mail.send(p.course, p.uri, subscribers)
+    db.remove_ping(p)
+    db.remove_course(p.course)
+    for email in subscribers:
+        db.remove_active_course(email, p.course)
+        db.add_inactive_course(email, p.course)
+
+    print("removed " + str(p))
+
 def recur():
     pings = db.get_pings()
     print("current queue =====================")
@@ -39,9 +54,7 @@ def recur():
     for ping in pings:
         p = Ping(ping["uri"], Course.unwrap(ping["course"]))
         empty = bot.snipe(p)
-        if empty:
-            db.remove_ping(p)
-            print("removed " + str(p))
+        if empty: found(p.course)
 
     print("===================================")
 
@@ -67,6 +80,9 @@ def teardown():
 atexit.register(teardown)
 
 if __name__ == '__main__':
+
+    #mail = Mail()
+
     print("connecting to redis")
     db = Database()
     db.clear_pings()
