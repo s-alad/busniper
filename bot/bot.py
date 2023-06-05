@@ -202,7 +202,7 @@ class Sniper:
                 
                 if section.valid(course):
                     print(section, "||| open: " ,section.can_add())
-                    return True
+                    return section.can_add()
                 
             except Exception as e:
                 #print("INVALID ROW EXCEPTION")

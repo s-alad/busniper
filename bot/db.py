@@ -65,10 +65,11 @@ class Database:
         return self.red.json().get("Users", email, no_escape=True)
     
     def remove_active_course(self, email: str, course: Course):
-        return self.red.json().arrpop("Users", email+".active-courses", self.red.json().arrindex("Users", email+".active", str(course)))
-    
+        index = self.red.json().arrindex("Users", '["{}"]["{}"]'.format(email, "active-courses"), str(course))
+        return self.red.json().arrpop("Users", '["{}"]["{}"]'.format(email, "active-courses"), index)
+        
     def add_inactive_course(self, email: str, course: Course):
-        return self.red.json().arrappend("Users", email+".inactive-courses", str(course))
+        return self.red.json().arrappend("Users", '["{}"]["{}"]'.format(email, "inactive-courses"), str(course))
 
 if __name__ == "__main__":
     db = Database()
@@ -79,5 +80,7 @@ if __name__ == "__main__":
     #    print(c.college, c.dept, c.course, c.section)
 
     #db.remove_ping(Ping("https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1?ModuleName=reg%2Fadd%2Fbrowse_schedule.pl&SearchOptionDesc=Class+Number&SearchOptionCd=S&ViewSem=Fall+2023&KeySem=20243&AddPlannerInd=&College=CAS&Dept=cs&Course=411&Section=A1", Course("CAS", "CS", "411", "A1")))
+    #print(db.get_course(Course("CAS", "CS", "237", "A1")))
+    print(db.add_inactive_course("xyz@gmail.com", Course("CAS", "CS", "237", "A1")))
 
     

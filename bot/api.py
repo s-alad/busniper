@@ -54,7 +54,7 @@ def recur():
     for ping in pings:
         p = Ping(ping["uri"], Course.unwrap(ping["course"]))
         empty = bot.snipe(p)
-        if empty: found(p.course)
+        if empty: found(p)
 
     print("===================================")
 
