@@ -58,12 +58,19 @@ def recur():
 
     print("===================================")
 
-@app.route('/register/<college>/<dept>/<course>/<section>')
-def register(college: str, dept: str, course: str, section: str):
+@app.route('/register/<college>/<dept>/<course>/<section/<email>')
+def register(college: str, dept: str, course: str, section: str, email: str):
     course = Course(college, dept, course, section)
-    uri = bot.register(course)
 
-    db.add_ping(Ping(uri, course))
+    if db.check_course_exists(course):
+        db.add_subscriber(course, email)
+        db.add_active_course(email, course)
+    else:
+        db.add_course(course)
+        uri = bot.register(course)
+        db.add_ping(Ping(uri, course))
+        db.add_subscriber(course, email)
+        db.add_active_course(email, course)
 
     return "Registered for " + str(course)
 
