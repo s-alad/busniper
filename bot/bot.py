@@ -116,7 +116,7 @@ class Sniper:
         except Exception as e:
             print(e)
     
-    def revalidate(self, courses: list[Course]) -> list[Ping]:
+    def revalidate(self, courses):
         self.close()
         self.login()
         self.getCookies()
@@ -175,8 +175,8 @@ class Sniper:
         course = ping.course
 
         r = requests.get(uri, headers=self.headers())
-        print("STATUS CODE:", r.status_code)
-        print(r.text)
+        #print("STATUS CODE:", r.status_code)
+        #print(r.text)
         soup = BeautifulSoup(r.content, 'html5lib')
         form = soup.find('form', attrs = {'name': 'SelectForm'})
         table = form.find('table')
@@ -207,7 +207,7 @@ class Sniper:
                 #print("INVALID ROW EXCEPTION")
                 continue
 
-    def generator(self, courses):
+    def generator(self, courses: list[Course]) -> Ping:
         for course in courses:
             uri = self.register(course)
             yield Ping(uri, course)

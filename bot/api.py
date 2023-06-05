@@ -37,7 +37,6 @@ def recur():
     print(*pings, sep = "\n")
     print("-----------------------------------")
     for ping in pings:
-
         p = Ping(ping["uri"], Course.unwrap(ping["course"]))
         bot.snipe(p)
 
@@ -56,7 +55,7 @@ def register(college: str, dept: str, course: str, section: str):
 def index(): return "BUSNIPER"
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=recur, trigger="interval", seconds=15)
+scheduler.add_job(func=recur, trigger="interval", seconds=60)
 
 def teardown():
     scheduler.shutdown()
@@ -65,6 +64,7 @@ def teardown():
 atexit.register(teardown)
 
 if __name__ == '__main__':
+    print("connecting to redis")
     db = Database()
     db.clear_pings()
     
@@ -72,10 +72,12 @@ if __name__ == '__main__':
     bot.login()
     bot.getCookies()
 
+    print("generating pings...")
     watchlist = [Course.unwrap(course) for course in db.get_all_course_names()]
     pings = bot.generator(watchlist)
     db.add_pings(pings)
 
+    print("starting scheduler...")
     scheduler.start()
 
     app.run(debug=False)
