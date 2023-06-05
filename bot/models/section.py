@@ -38,7 +38,6 @@ class Section:
         return self.__str__()
     
     def valid(self, course: Course):
-        if course.section == None: return True
         validsection = self.classname.replace(u'\xa0', u' ').split(" ")[2] == course.section
         validcourse = self.classname.replace(u'\xa0', u' ').split(" ")[1] == course.dept+course.course
         return validsection and validcourse

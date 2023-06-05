@@ -169,7 +169,7 @@ class Sniper:
         #print(jsondata)
         #print(r.text)
     
-    def snipe(self, ping: Ping):
+    def snipe(self, ping: Ping) -> bool:
 
         uri = ping.uri
         course = ping.course
@@ -202,10 +202,13 @@ class Sniper:
                 
                 if section.valid(course):
                     print(section, "||| open: " ,section.can_add())
-                    break
+                    return True
+                
             except Exception as e:
                 #print("INVALID ROW EXCEPTION")
                 continue
+        
+        return False
 
     def generator(self, courses: list[Course]) -> Ping:
         for course in courses:

@@ -31,6 +31,10 @@ class Database:
     def add_ping(self, ping: Ping):
         return self.red.json().arrappend("Pings", "$", ping.__dict__())
     
+    def remove_ping(self, ping: Ping):
+        index = self.red.json().arrindex("Pings", ".",ping.__dict__())
+        return self.red.json().arrpop("Pings", ".", index)
+    
     def add_pings(self, pings: list[Ping]):
         for ping in pings: self.add_ping(ping)
     
@@ -51,8 +55,10 @@ class Database:
 
 if __name__ == "__main__":
     db = Database()
-    print(db.clear_pings())
-    watchlist = [Course.unwrap(course) for course in db.get_all_course_names()]
-    print(watchlist)
-    for c in watchlist:
-        print(c.college, c.dept, c.course, c.section)
+   # print(db.clear_pings())
+    #watchlist = [Course.unwrap(course) for course in db.get_all_course_names()]
+    #print(watchlist)
+    #for c in watchlist:
+    #    print(c.college, c.dept, c.course, c.section)
+
+    db.remove_ping(Ping("https://www.bu.edu/link/bin/uiscgi_studentlink.pl/1?ModuleName=reg%2Fadd%2Fbrowse_schedule.pl&SearchOptionDesc=Class+Number&SearchOptionCd=S&ViewSem=Fall+2023&KeySem=20243&AddPlannerInd=&College=CAS&Dept=cs&Course=411&Section=A1", Course("CAS", "CS", "411", "A1")))

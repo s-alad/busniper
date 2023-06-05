@@ -1,5 +1,4 @@
 import smtplib
-
 from email.message import EmailMessage
 
 class Email:
@@ -7,7 +6,7 @@ class Email:
         msg = EmailMessage()
         s = smtplib.SMTP('localhost')
 
-    def send(self, course: str, link: str, email: str):
+    def send(self, course: str, link: str, emails: list[str]):
         self.msg.set_content("""\
         {course} has an EMPTY seat!
         Act quick! Click here[1] to register
@@ -29,7 +28,7 @@ class Email:
 
         self.msg['Subject'] = "{course} has an EMPTY seat!}".format(course="")
         self.msg['From'] = "alert@emptyclass.info"
-        self.msg['To'] = "{email}".format(email="")
+        self.msg['To'] = " ,".join(emails)
 
         self.s.send_message(self.msg)
         self.s.quit()

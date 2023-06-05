@@ -38,7 +38,10 @@ def recur():
     print("-----------------------------------")
     for ping in pings:
         p = Ping(ping["uri"], Course.unwrap(ping["course"]))
-        bot.snipe(p)
+        empty = bot.snipe(p)
+        if empty:
+            db.remove_ping(p)
+            print("removed " + str(p))
 
     print("===================================")
 
