@@ -67,6 +67,17 @@ class Database:
     def get_user(self, email: str):
         return self.red.json().get("Users", email, no_escape=True)
     
+    def user_exists(self, email: str):
+        return email in self.get_users_emails()
+    
+    def create_user(self, email: str, number: str):
+        u = {
+            "active-courses" : [],
+            "inactive-courses" : [],
+            "number" : number,
+            "credits" : 0
+        }
+    
     def remove_active_course(self, email: str, course: Course):
         index = self.red.json().arrindex("Users", '["{}"]["{}"]'.format(email, "active-courses"), str(course))
         return self.red.json().arrpop("Users", '["{}"]["{}"]'.format(email, "active-courses"), index)
