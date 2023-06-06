@@ -58,6 +58,18 @@ def recur():
 
     print("===================================")
 
+@app.route("/signup", methods=['POST'])
+def signup():
+    email = request.form["email"]
+    number = request.form["number"] if "number" in request.form else None
+    if email.split("@")[1] != "bu.edu": 
+        return "invalid email"
+    if db.user_exists(email): 
+        return "please login"
+    else:
+        db.create_user(email, number)
+        return "success"
+
 @app.route('/register/<college>/<dept>/<course>/<section/<email>')
 def register(college: str, dept: str, course: str, section: str, email: str):
     course = Course(college, dept, course, section)
