@@ -1,8 +1,8 @@
 .env
 geckodriver.log
 cookies.pkl
-/bot/saved-chrome-profile/
+/server/saved-chrome-profile/
 /saved-chrome-profile/
 /profile
-/bot/profile
+/server/profile
 __pycache__
