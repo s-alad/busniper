@@ -65,7 +65,7 @@ class Database:
         return list(self.red.json().get("Users").keys())
     
     def get_user(self, email: str):
-        return self.red.json().get("Users", email, no_escape=True)
+        return self.red.json().get("Users", '["{}"]'.format(email), no_escape=True)
     
     def user_exists(self, email: str):
         return email in self.get_users_emails()
@@ -112,4 +112,6 @@ if __name__ == "__main__":
 
     #print(db.create_user("saad7@bu.edu", "1234567890"))
     #print(db.add_credits("saad7@bu.edu", 1))
+
+    print(db.get_user("saad7@bu.edu"))
     
