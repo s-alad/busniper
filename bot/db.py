@@ -75,8 +75,10 @@ class Database:
             "active-courses" : [],
             "inactive-courses" : [],
             "number" : number,
-            "credits" : 0
+            "credits" : 0,
+            "email" : email,
         }
+        return self.red.json().set("Users", '["{}"]'.format(email), u)
     
     def remove_active_course(self, email: str, course: Course):
         index = self.red.json().arrindex("Users", '["{}"]["{}"]'.format(email, "active-courses"), str(course))
@@ -101,4 +103,6 @@ if __name__ == "__main__":
     #print(db.add_inactive_course("xyz@gmail.com", Course("CAS", "CS", "237", "A1")))
 
     #print(db.check_course_exists(Course("CAS", "CS", "411", "A1")))
+
+    print(db.create_user("saad7@bu.edu", "1234567890"))
     
