@@ -80,6 +80,12 @@ class Database:
         }
         return self.red.json().set("Users", '["{}"]'.format(email), u)
     
+    def add_credits(self, email: str, credits: int):
+        return self.red.json().numincrby("Users", '["{}"]["{}"]'.format(email, "credits"), credits)
+    
+    def remove_credits(self, email: str, credits: int):
+        return self.add_credits(email, -credits)
+    
     def remove_active_course(self, email: str, course: Course):
         index = self.red.json().arrindex("Users", '["{}"]["{}"]'.format(email, "active-courses"), str(course))
         return self.red.json().arrpop("Users", '["{}"]["{}"]'.format(email, "active-courses"), index)
@@ -104,5 +110,6 @@ if __name__ == "__main__":
 
     #print(db.check_course_exists(Course("CAS", "CS", "411", "A1")))
 
-    print(db.create_user("saad7@bu.edu", "1234567890"))
+    #print(db.create_user("saad7@bu.edu", "1234567890"))
+    #print(db.add_credits("saad7@bu.edu", 1))
     
