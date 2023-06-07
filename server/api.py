@@ -146,21 +146,46 @@ def logout():
     logout_user()
     return redirect(url_for("index"))
 
-@app.route('/register/<college>/<dept>/<course>/<section>/<email>')
-def register(college: str, dept: str, course: str, section: str, email: str):
-    course = Course(college, dept, course, section)
+@app.route('/register', methods=['POST'])
+@login_required
+def register():
+    course = Course(
+        request.form.get("college"),
+        request.form.get("dept"),
+        request.form.get("course"),
+        request.form.get("section")
+    )
+    user_email = current_user.email
 
     if db.check_course_exists(course):
-        db.add_subscriber(course, email)
-        db.add_active_course(email, course)
+        db.add_subscriber(course, user_email)
+        db.add_active_course(user_email, course)
     else:
         db.add_course(course)
         uri = bot.register(course)
         db.add_ping(Ping(uri, course))
-        db.add_subscriber(course, email)
-        db.add_active_course(email, course)
-
+        db.add_subscriber(course, user_email)
+        db.add_active_course(user_email, course)
+    
+    db.remove_credits(user_email, 1)
+    
     return "Registered for " + str(course)
+
+# @app.route('/register/<college>/<dept>/<course>/<section>/<email>')
+# def register(college: str, dept: str, course: str, section: str, email: str):
+#     course = Course(college, dept, course, section)
+
+#     if db.check_course_exists(course):
+#         db.add_subscriber(course, email)
+#         db.add_active_course(email, course)
+#     else:
+#         db.add_course(course)
+#         uri = bot.register(course)
+#         db.add_ping(Ping(uri, course))
+#         db.add_subscriber(course, email)
+#         db.add_active_course(email, course)
+
+#     return "Registered for " + str(course)
 
 @app.route('/')
 def index(): 
