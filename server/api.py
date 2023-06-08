@@ -63,8 +63,7 @@ def load_user(email: str):
 def get_google_provider_cfg():
     return requests.get(googlediscovery).json()
 
-@app.route("/login", methods=["GET"])
-@cross_origin()
+@app.route("/login")
 def login():
     print("starting google login")
     print("fetching google provider cfg")
