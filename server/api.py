@@ -15,6 +15,7 @@ from flask_login import (
     login_user,
     logout_user,
 )
+from flask_cors import CORS, cross_origin
 
 from oauthlib.oauth2 import WebApplicationClient
 
@@ -47,6 +48,7 @@ googlediscovery = ("https://accounts.google.com/.well-known/openid-configuration
 #===================================================================================================
 
 app = Flask(__name__)
+cors = CORS(app)
 app.secret_key = os.urandom(24)
 
 login_manager = LoginManager()
@@ -62,6 +64,7 @@ def get_google_provider_cfg():
     return requests.get(googlediscovery).json()
 
 @app.route("/login")
+@cross_origin()
 def login():
     print("starting google login")
     print("fetching google provider cfg")
@@ -147,13 +150,16 @@ def logout():
     return redirect(url_for("index"))
 
 @app.route('/register', methods=['POST'])
+@cross_origin()
 @login_required
 def register():
+    print("registering for course")
+    data = request.get_json()
     course = Course(
-        request.form.get("college"),
-        request.form.get("dept"),
-        request.form.get("course"),
-        request.form.get("section")
+        data["college"],
+        data["department"],
+        data["course"],
+        data["section"]
     )
     user_email = current_user.email
 
@@ -235,17 +241,17 @@ if __name__ == '__main__':
     db.clear_pings()
     
 
-    #bot = Sniper()
-    #bot.login()
-    #bot.getCookies()
+    # bot = Sniper()
+    # bot.login()
+    # bot.getCookies()
 
-    #print("generating pings...")
-    #watchlist = [Course.unwrap(course) for course in db.get_all_course_names()]
-    #pings = bot.generator(watchlist)
-    #db.add_pings(pings)
+    # print("generating pings...")
+    # watchlist = [Course.unwrap(course) for course in db.get_all_course_names()]
+    # pings = bot.generator(watchlist)
+    # db.add_pings(pings)
 
-    #print("starting scheduler...")
-    #scheduler.start()
+    # print("starting scheduler...")
+    # scheduler.start()
 
     app.run(debug=True, port=5000, ssl_context="adhoc")
 
