@@ -63,7 +63,7 @@ def load_user(email: str):
 def get_google_provider_cfg():
     return requests.get(googlediscovery).json()
 
-@app.route("/login")
+@app.route("/login", methods=["GET"])
 @cross_origin()
 def login():
     print("starting google login")
@@ -81,6 +81,7 @@ def login():
     return redirect(request_uri)
 
 @app.route("/login/callback")
+@cross_origin()
 def callback():
     print("callback received from google")
     code = request.args.get("code")
@@ -144,6 +145,7 @@ def callback():
     return redirect(url_for("index"))
 
 @app.route("/logout")
+@cross_origin()
 @login_required
 def logout():
     logout_user()
